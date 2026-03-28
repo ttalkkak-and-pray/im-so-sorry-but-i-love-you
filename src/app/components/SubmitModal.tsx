@@ -26,7 +26,7 @@ export function SubmitModal({ isOpen, onClose }: SubmitModalProps) {
   const paragraphs = text.split('\n');
   const visualLines: string[] = [];
   
-  paragraphs.forEach((paragraph, pIndex) => {
+  paragraphs.forEach((paragraph) => {
     if (paragraph.length === 0) {
       visualLines.push('');
     } else {
@@ -153,13 +153,7 @@ export function SubmitModal({ isOpen, onClose }: SubmitModalProps) {
             {/* 도장 */}
             {showStamp && (
               <div css={stampStyle}>
-                <div css={stampInnerStyle}>
-                  <div css={stampTextStyle}>
-                    진정성
-                    <br />
-                    인증
-                  </div>
-                </div>
+                <img src="/stamp.png" alt="진정성 인증 도장" css={stampImgStyle} />
               </div>
             )}
           </div>
@@ -327,28 +321,10 @@ const stampStyle = css`
   z-index: 10;
 `;
 
-const stampInnerStyle = css`
+const stampImgStyle = css`
   width: 100%;
   height: 100%;
-  border: 4px solid var(--secondary);
-  border-radius: 50%;
-  background: rgba(181, 36, 36, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 
-    inset 0 0 0 2px var(--surface),
-    inset 0 0 0 4px var(--secondary);
-`;
-
-const stampTextStyle = css`
-  font-family: 'Noto Serif KR', serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--secondary);
-  text-align: center;
-  line-height: 1.4;
-  letter-spacing: 0.05em;
+  object-fit: contain;
 `;
 
 const footerStyle = css`
