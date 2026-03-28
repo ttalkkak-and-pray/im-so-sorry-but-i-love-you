@@ -1,35 +1,37 @@
 /** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useReflectionStore } from '../store';
-import confessionData from '../../assets/confession.json';
+import { css } from "@emotion/react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { useReflectionStore } from "../store";
+import confessionData from "../../assets/confession.json";
 
 export function InterrogationPage() {
   const navigate = useNavigate();
   const setNickname = useReflectionStore((state) => state.setNickname);
   const setCrime = useReflectionStore((state) => state.setCrime);
 
-  const [step, setStep] = useState<'intro' | 'nickname' | 'question' | 'subQuestion' | 'result'>('intro');
-  const [localNickname, setLocalNickname] = useState('');
-  
+  const [step, setStep] = useState<
+    "intro" | "nickname" | "question" | "subQuestion" | "result"
+  >("intro");
+  const [localNickname, setLocalNickname] = useState("");
+
   const [questionsPool, setQuestionsPool] = useState<any[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [noCount, setNoCount] = useState(0);
-  const [shakeClass, setShakeClass] = useState('');
-  const [shakeMessage, setShakeMessage] = useState('');
-  
-  const [subType, setSubType] = useState<'input' | 'branch' | null>(null);
+  const [shakeClass, setShakeClass] = useState("");
+  const [shakeMessage, setShakeMessage] = useState("");
+
+  const [subType, setSubType] = useState<"input" | "branch" | null>(null);
   const [subData, setSubData] = useState<any>(null);
-  const [subInput, setSubInput] = useState('');
-  
+  const [subInput, setSubInput] = useState("");
+
   const [finalCrime, setFinalCrime] = useState<any>(null);
 
   useEffect(() => {
     // Initialize questions
-    const q1 = confessionData.questions.find(q => q.id === 'q1');
-    const others = confessionData.questions.filter(q => q.id !== 'q1');
-    
+    const q1 = confessionData.questions.find((q) => q.id === "q1");
+    const others = confessionData.questions.filter((q) => q.id !== "q1");
+
     // Shuffle others
     const shuffled = [...others].sort(() => Math.random() - 0.5);
     setQuestionsPool(shuffled);
@@ -37,24 +39,26 @@ export function InterrogationPage() {
   }, []);
 
   const handleStart = () => {
-    setStep('nickname');
+    setStep("nickname");
   };
 
   const handleNicknameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (localNickname.trim()) {
       setNickname(localNickname.trim());
-      setStep('question');
+      setStep("question");
     }
   };
 
   const triggerShake = (count: number) => {
-    const effect = confessionData.meta.shakeEffects.levels.find(l => l.noCount === count);
+    const effect = confessionData.meta.shakeEffects.levels.find(
+      (l) => l.noCount === count,
+    );
     if (effect) {
       setShakeClass(effect.shakeClass);
       setShakeMessage(effect.message);
-      setTimeout(() => setShakeClass(''), 1000);
-      
+      setTimeout(() => setShakeClass(""), 1000);
+
       if (effect.triggerForcedCrime) {
         handleConfirmCrime(confessionData.forcedNoCrime.crime);
       }
@@ -64,13 +68,17 @@ export function InterrogationPage() {
   const handleConfirmCrime = (crime: any, customInput?: string) => {
     let finalDescription = crime.description;
     if (crime.descriptionTemplate && customInput) {
-      finalDescription = crime.descriptionTemplate.replace('{input}', customInput);
+      finalDescription = crime.descriptionTemplate.replace(
+        "{input}",
+        customInput,
+      );
     }
-    
+
     // Attach theme colors
     const themeKey = crime.theme as keyof typeof confessionData.themes;
-    const themeObj = confessionData.themes[themeKey] || confessionData.themes.manuscript;
-    
+    const themeObj =
+      confessionData.themes[themeKey] || confessionData.themes.manuscript;
+
     const crimeResult = {
       ...crime,
       description: finalDescription,
@@ -78,27 +86,29 @@ export function InterrogationPage() {
       themeLabel: themeObj.label,
       stampText: themeObj.stampText,
     };
-    
+
     setFinalCrime(crimeResult);
     setCrime(crimeResult);
-    setStep('result');
+    setStep("result");
   };
 
-  const handleAnswer = (type: 'yes' | 'no') => {
+  const handleAnswer = (type: "yes" | "no") => {
     const answerData = currentQuestion.answers[type];
-    
+
     if (!answerData) {
       // Missing data, just move to random
       processNextRandom();
       return;
     }
 
-    if (type === 'no') {
+    if (type === "no") {
       const newCount = noCount + 1;
       setNoCount(newCount);
       triggerShake(newCount);
-      
-      const effect = confessionData.meta.shakeEffects.levels.find(l => l.noCount === newCount);
+
+      const effect = confessionData.meta.shakeEffects.levels.find(
+        (l) => l.noCount === newCount,
+      );
       if (effect && effect.triggerForcedCrime) return;
 
       // Unconditionally go to next random for 'no' answers to allow reaching 10 questions
@@ -106,22 +116,26 @@ export function InterrogationPage() {
       return;
     }
 
-    if (answerData.crime && answerData.type !== 'input' && answerData.type !== 'branch') {
+    if (
+      answerData.crime &&
+      answerData.type !== "input" &&
+      answerData.type !== "branch"
+    ) {
       handleConfirmCrime(answerData.crime);
       return;
     }
 
-    if (answerData.type === 'input') {
-      setSubType('input');
+    if (answerData.type === "input") {
+      setSubType("input");
       setSubData(answerData);
-      setStep('subQuestion');
+      setStep("subQuestion");
       return;
     }
 
-    if (answerData.type === 'branch') {
-      setSubType('branch');
+    if (answerData.type === "branch") {
+      setSubType("branch");
       setSubData(answerData);
-      setStep('subQuestion');
+      setStep("subQuestion");
       return;
     }
   };
@@ -139,7 +153,7 @@ export function InterrogationPage() {
 
   const handleSubSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (subType === 'input' && subInput.trim()) {
+    if (subType === "input" && subInput.trim()) {
       handleConfirmCrime(subData.crime, subInput.trim());
     }
   };
@@ -150,75 +164,101 @@ export function InterrogationPage() {
 
   const handleGoToConfession = () => {
     // Optionally log prompt if using a backend, but per user request, we skip AI usage
-    navigate('/confession');
+    navigate("/confession");
   };
 
   return (
     <div css={containerStyle}>
       <div css={wrapperStyle}>
-        
-        {step === 'intro' && (
+        {step === "intro" && (
           <div css={cardStyle}>
             <h1 css={titleStyle}>진정성 100% 반성문 봇</h1>
-            <p css={descStyle}>당신은 이미 유죄입니다.<br/>어떤 변명도 통하지 않습니다. 심문을 시작합니다.</p>
-            <button css={primaryBtnStyle} onClick={handleStart}>심문 시작</button>
+            {/* <p css={descStyle}>당신은 이미 유죄입니다.<br/>어떤 변명도 통하지 않습니다. 심문을 시작합니다.</p> */}
+            <button css={primaryBtnStyle} onClick={handleStart}>
+              심문 시작
+            </button>
           </div>
         )}
 
-        {step === 'nickname' && (
+        {step === "nickname" && (
           <div css={cardStyle}>
             <h2 css={titleStyle}>신원 확인</h2>
             <form onSubmit={handleNicknameSubmit} css={formStyle}>
               <label css={labelStyle}>이름(닉네임)을 밝히시오.</label>
-              <input 
-                css={inputStyle} 
+              <input
+                css={inputStyle}
                 autoFocus
                 value={localNickname}
-                onChange={e => setLocalNickname(e.target.value)}
+                onChange={(e) => setLocalNickname(e.target.value)}
                 placeholder="홍길동"
               />
-              <button css={primaryBtnStyle} type="submit" disabled={!localNickname.trim()}>확인</button>
+              <button
+                css={primaryBtnStyle}
+                type="submit"
+                disabled={!localNickname.trim()}
+              >
+                확인
+              </button>
             </form>
           </div>
         )}
 
-        {step === 'question' && currentQuestion && (
+        {step === "question" && currentQuestion && (
           <div css={[cardStyle, getShakeStyle(shakeClass)]}>
             <div css={badgeStyle}>심문 중...</div>
             <h2 css={questionStyle}>{currentQuestion.question}</h2>
-            {currentQuestion.hint && <p css={hintStyle}>{currentQuestion.hint}</p>}
-            
+            {currentQuestion.hint && (
+              <p css={hintStyle}>{currentQuestion.hint}</p>
+            )}
+
             {shakeMessage && <div css={errorMsgStyle}>{shakeMessage}</div>}
 
             <div css={btnGroupStyle}>
-              <button css={primaryBtnStyle} onClick={() => handleAnswer('yes')}>예</button>
-              <button css={secondaryBtnStyle} onClick={() => handleAnswer('no')}>아니오</button>
+              <button css={primaryBtnStyle} onClick={() => handleAnswer("yes")}>
+                예
+              </button>
+              <button
+                css={secondaryBtnStyle}
+                onClick={() => handleAnswer("no")}
+              >
+                아니오
+              </button>
             </div>
           </div>
         )}
 
-        {step === 'subQuestion' && subData && (
+        {step === "subQuestion" && subData && (
           <div css={cardStyle}>
             <h2 css={questionStyle}>{subData.prompt}</h2>
-            
-            {subType === 'input' && (
+
+            {subType === "input" && (
               <form onSubmit={handleSubSubmit} css={formStyle}>
-                <input 
+                <input
                   css={inputStyle}
                   autoFocus
-                  type={subData.inputType || 'text'}
-                  placeholder={subData.placeholder || ''}
+                  type={subData.inputType || "text"}
+                  placeholder={subData.placeholder || ""}
                   value={subInput}
-                  onChange={e => setSubInput(e.target.value)}
+                  onChange={(e) => setSubInput(e.target.value)}
                 />
-                <button css={primaryBtnStyle} type="submit" disabled={!subInput.trim()}>제출</button>
+                <button
+                  css={primaryBtnStyle}
+                  type="submit"
+                  disabled={!subInput.trim()}
+                >
+                  제출
+                </button>
               </form>
             )}
 
-            {subType === 'branch' && (
+            {subType === "branch" && (
               <div css={btnGroupVerticalStyle}>
                 {subData.options.map((opt: any, idx: number) => (
-                  <button key={idx} css={secondaryBtnStyle} onClick={() => handleBranchSelect(opt)}>
+                  <button
+                    key={idx}
+                    css={secondaryBtnStyle}
+                    onClick={() => handleBranchSelect(opt)}
+                  >
                     {opt.label}
                   </button>
                 ))}
@@ -227,28 +267,31 @@ export function InterrogationPage() {
           </div>
         )}
 
-        {step === 'result' && finalCrime && (
+        {step === "result" && finalCrime && (
           <div css={resultCardStyle}>
             <div css={emojiStyle}>{finalCrime.emoji}</div>
             <h1 css={crimeTitleStyle}>{finalCrime.title}</h1>
             <div css={severityStyle}>형량: {finalCrime.severity}</div>
             <p css={crimeDescStyle}>{finalCrime.description}</p>
-            
+
             {finalCrime.additionalCharges && (
               <div css={chargesStyle}>
                 <strong>추가 혐의:</strong>
                 <ul>
-                  {finalCrime.additionalCharges.map((c: string, i: number) => <li key={i}>{c}</li>)}
+                  {finalCrime.additionalCharges.map((c: string, i: number) => (
+                    <li key={i}>{c}</li>
+                  ))}
                 </ul>
               </div>
             )}
 
             <div css={themeBadgeStyle}>적용 테마: {finalCrime.themeLabel}</div>
 
-            <button css={dangerBtnStyle} onClick={handleGoToConfession}>반성문 작성하러 가기</button>
+            <button css={dangerBtnStyle} onClick={handleGoToConfession}>
+              반성문 작성하러 가기
+            </button>
           </div>
         )}
-
       </div>
     </div>
   );
@@ -282,7 +325,7 @@ const cardStyle = css`
 `;
 
 const titleStyle = css`
-  font-family: 'Noto Serif KR', serif;
+  font-family: "Noto Serif KR", serif;
   font-size: 28px;
   font-weight: 700;
   text-align: center;
@@ -413,9 +456,15 @@ const errorMsgStyle = css`
   font-size: 14px;
   animation: pulse 0.5s infinite;
   @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 `;
 
@@ -431,7 +480,7 @@ const emojiStyle = css`
 `;
 
 const crimeTitleStyle = css`
-  font-family: 'Noto Serif KR', serif;
+  font-family: "Noto Serif KR", serif;
   font-size: 32px;
   color: var(--secondary);
   margin: 0;
@@ -474,22 +523,32 @@ const themeBadgeStyle = css`
 // Dynamic shake animations
 const getShakeStyle = (shakeClass: string) => {
   if (!shakeClass) return css``;
-  
-  let x = '0px';
-  if (shakeClass === 'shake-sm') x = '2px';
-  if (shakeClass === 'shake-md') x = '5px';
-  if (shakeClass === 'shake-lg') x = '8px';
-  if (shakeClass === 'shake-xl') x = '12px';
-  if (shakeClass === 'shake-max') x = '20px';
+
+  let x = "0px";
+  if (shakeClass === "shake-sm") x = "2px";
+  if (shakeClass === "shake-md") x = "5px";
+  if (shakeClass === "shake-lg") x = "8px";
+  if (shakeClass === "shake-xl") x = "12px";
+  if (shakeClass === "shake-max") x = "20px";
 
   return css`
     animation: shakeAnim 0.1s infinite;
     @keyframes shakeAnim {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(${x}); }
-      50% { transform: translateX(0); }
-      75% { transform: translateX(-${x}); }
-      100% { transform: translateX(0); }
+      0% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(${x});
+      }
+      50% {
+        transform: translateX(0);
+      }
+      75% {
+        transform: translateX(-${x});
+      }
+      100% {
+        transform: translateX(0);
+      }
     }
   `;
 };
