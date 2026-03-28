@@ -11,7 +11,7 @@ export default function MainPage() {
       <header css={heroStyle}>
         <div css={heroInnerStyle}>
           <img src="/logo.png" alt="암소쏘리 로고" css={logoImgStyle} />
-          <h1 css={titleStyle}>진정성 강제 반성문 작성기</h1>
+          <h1 css={titleStyle}>But I Love U 다 거짓말 🎶</h1>
           <p css={heroSubtitleStyle}>손가락이 아파야 마음이 열립니다.</p>
         </div>
       </header>
