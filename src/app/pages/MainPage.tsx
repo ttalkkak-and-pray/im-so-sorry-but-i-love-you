@@ -12,7 +12,7 @@ export default function MainPage() {
         <div css={heroInnerStyle}>
           <img src="/logo.png" alt="암소쏘리 로고" css={logoImgStyle} />
           <h1 css={titleStyle}>진정성 강제 반성문 작성기</h1>
-          <p css={heroSubtitleStyle}>불편함이 곧 진심입니다.</p>
+          <p css={heroSubtitleStyle}>손가락이 아파야 마음이 열립니다.</p>
         </div>
       </header>
 
@@ -26,15 +26,15 @@ export default function MainPage() {
           <div css={warningListStyle}>
             <div css={warningItemStyle}>
               <span css={warningIconStyle}>✕</span>
-              <span>키보드는 사용할 수 없습니다</span>
+              <span>물리 키보드는 반성을 방해합니다</span>
             </div>
             <div css={warningItemStyle}>
               <span css={warningIconStyle}>✕</span>
-              <span>한 글자씩 직접 눌러 작성해야 합니다</span>
+              <span>손가락 하나로 죄값을 치르세요</span>
             </div>
             <div css={warningItemStyle}>
               <span css={warningIconStyle}>✕</span>
-              <span>규칙을 어길수록 진정성이 낮아집니다</span>
+              <span>규칙을 어기면 당신의 반성은 무효입니다 (암소가 압니다)</span>
             </div>
           </div>
         </section>
@@ -49,8 +49,8 @@ export default function MainPage() {
             <div css={stepItemStyle}>
               <div css={stepNumberStyle}>1</div>
               <div css={stepContentStyle}>
-                <strong>심문을 통해 죄목 확정</strong>
-                <p>몇 가지 질문에 답하면 당신의 죄목이 결정됩니다.</p>
+                <strong>당신의 죄목을 스스로 자백하세요</strong>
+                <p>부정해도 소용없습니다. 암소는 이미 알고 있습니다.</p>
               </div>
             </div>
             <div css={stepDividerStyle} />
@@ -65,8 +65,8 @@ export default function MainPage() {
             <div css={stepItemStyle}>
               <div css={stepNumberStyle}>3</div>
               <div css={stepContentStyle}>
-                <strong>진정성을 담아 작성</strong>
-                <p>탭 이동, 자리 이탈, 무입력 5분 경과 시 작성 내용이 초기화됩니다.</p>
+                <strong>눈물은 선택, 반성은 필수</strong>
+                <p>자리를 피하면 반성문이 사라집니다. 도망은 허용되지 않습니다.</p>
               </div>
             </div>
             <div css={stepDividerStyle} />
@@ -83,9 +83,9 @@ export default function MainPage() {
         {/* CTA */}
         <div css={ctaWrapperStyle}>
           <button css={ctaButtonStyle} onClick={() => navigate('/interrogation')}>
-            심문 시작하기
+            죄를 인정하고 시작하기
           </button>
-          <p css={ctaNoteStyle}>작성을 시작하면 규칙이 즉시 적용됩니다</p>
+          <p css={ctaNoteStyle}>이미 늦었습니다. 시작하세요.</p>
         </div>
       </main>
 
