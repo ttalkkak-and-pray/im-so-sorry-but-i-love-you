@@ -19,6 +19,7 @@ export default function ConfessionPage() {
   const [isPeriodModalOpen, setIsPeriodModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isDeleteAllConfirmOpen, setIsDeleteAllConfirmOpen] = useState(false);
+  const [isGiveUpConfirmOpen, setIsGiveUpConfirmOpen] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, title: '', message: '' });
   
   const resetAll = useReflectionStore(state => state.resetAll);
@@ -28,10 +29,13 @@ export default function ConfessionPage() {
   const submit = useReflectionStore(state => state.submit);
   
   const handleGiveUp = () => {
-    if (window.confirm('정말 포기하시겠습니까?\n\n작성 중인 모든 내용이 사라집니다.')) {
-      resetAll('포기하기 선택');
-      navigate('/');
-    }
+    setIsGiveUpConfirmOpen(true);
+  };
+  
+  const confirmGiveUp = () => {
+    resetAll('포기하기 선택');
+    navigate('/');
+    setIsGiveUpConfirmOpen(false);
   };
   
   // 물리 키보드 입력 차단
@@ -195,6 +199,17 @@ export default function ConfessionPage() {
         variant="danger"
         onConfirm={confirmDeleteAll}
         onCancel={() => setIsDeleteAllConfirmOpen(false)}
+      />
+      
+      <ConfirmModal
+        isOpen={isGiveUpConfirmOpen}
+        title="포기하기"
+        message="정말 포기하시겠습니까?\n\n작성 중인 모든 내용이 사라집니다."
+        confirmText="포기하기"
+        cancelText="취소"
+        variant="danger"
+        onConfirm={confirmGiveUp}
+        onCancel={() => setIsGiveUpConfirmOpen(false)}
       />
       
       <ErrorModal

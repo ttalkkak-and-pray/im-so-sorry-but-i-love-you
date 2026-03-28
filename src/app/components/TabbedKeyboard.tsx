@@ -18,6 +18,7 @@ export function TabbedKeyboard({
   const [activeTab, setActiveTab] = useState<'korean' | 'number' | 'special'>('korean');
   const [selectedConsonant, setSelectedConsonant] = useState<string | null>(null);
   const [shuffledNumbers, setShuffledNumbers] = useState<string[]>(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']);
+  const [shuffledSpecialChars, setShuffledSpecialChars] = useState<string[]>([...SPECIAL_CHARS]);
   
   const addCharacter = useReflectionStore(state => state.addCharacter);
   
@@ -31,6 +32,16 @@ export function TabbedKeyboard({
     setShuffledNumbers(numbers);
   };
   
+  // 특수문자 배열 섞기
+  const shuffleSpecialChars = () => {
+    const chars = [...SPECIAL_CHARS];
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    setShuffledSpecialChars(chars);
+  };
+  
   const handleNumberClick = (num: string) => {
     addCharacter(num);
     shuffleNumbers(); // 숫자 선택 후 재배열
@@ -42,6 +53,7 @@ export function TabbedKeyboard({
     } else {
       addCharacter(char);
     }
+    shuffleSpecialChars(); // 특수문자 선택 후 재배열
   };
   
   const handleCharacterClick = (char: string) => {
@@ -153,7 +165,7 @@ export function TabbedKeyboard({
         {activeTab === 'special' && (
           <div css={specialTabStyle}>
             <div css={specialGridStyle}>
-              {SPECIAL_CHARS.map((char, index) => (
+              {shuffledSpecialChars.map((char, index) => (
                 <button
                   key={`${char}-${index}`}
                   css={specialButtonStyle(char === '.')}

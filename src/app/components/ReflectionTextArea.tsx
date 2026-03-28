@@ -9,8 +9,38 @@ export function ReflectionTextArea() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
+  // 반응형 칸 수 결정 (실제로는 미디어쿼리로 CSS에서 제어하지만, 계산을 위해 기본값 사용)
+  const CHARS_PER_LINE = 20;
+  
   // 줄바꿈을 기준으로 텍스트를 줄 단위로 분리
-  const lines = text.split('\n');
+  const paragraphs = text.split('\n');
+  
+  // 각 문단을 칸 수에 맞춰 시각적 줄로 나누기
+  const visualLines: { text: string; isLastInDocument: boolean; originalLength: number }[] = [];
+  
+  paragraphs.forEach((paragraph, pIndex) => {
+    if (paragraph.length === 0) {
+      // 빈 줄은 그대로 표시
+      visualLines.push({
+        text: '',
+        isLastInDocument: pIndex === paragraphs.length - 1,
+        originalLength: 0
+      });
+    } else {
+      // 긴 문단은 CHARS_PER_LINE 칸씩 나눔
+      for (let i = 0; i < paragraph.length; i += CHARS_PER_LINE) {
+        const chunk = paragraph.slice(i, i + CHARS_PER_LINE);
+        const isLastChunk = i + CHARS_PER_LINE >= paragraph.length;
+        const isLastParagraph = pIndex === paragraphs.length - 1;
+        
+        visualLines.push({
+          text: chunk,
+          isLastInDocument: isLastParagraph && isLastChunk,
+          originalLength: chunk.length
+        });
+      }
+    }
+  });
   
   // 커서가 있는 위치로 부드럽게 스크롤 (화면이 위로 올라가지 않도록)
   useEffect(() => {
@@ -25,7 +55,7 @@ export function ReflectionTextArea() {
       if (cursorRect.bottom > containerRect.bottom) {
         cursor.scrollIntoView({
           behavior: 'smooth',
-          block: 'end',
+          block: 'nearest',
           inline: 'nearest'
         });
       }
@@ -52,21 +82,19 @@ export function ReflectionTextArea() {
       
       <div css={paperStyle} ref={containerRef}>
         <div css={gridContainerStyle}>
-          {/* 각 줄을 렌더링 */}
-          {lines.map((line, lineIndex) => {
-            const characters = line.split('');
-            const isLastLine = lineIndex === lines.length - 1;
-            const cellsInLine = Math.max(20, characters.length + (isLastLine ? 5 : 0));
+          {/* 각 시각적 줄을 렌더링 */}
+          {visualLines.map((line, lineIndex) => {
+            const characters = line.text.split('');
             
             return (
               <div key={lineIndex} css={lineContainerStyle}>
-                {Array.from({ length: cellsInLine }).map((_, charIndex) => (
+                {Array.from({ length: CHARS_PER_LINE }).map((_, charIndex) => (
                   <div key={`${lineIndex}-${charIndex}`} css={gridCellStyle}>
                     <span css={characterStyle}>
                       {characters[charIndex] || ''}
                     </span>
                     {/* 마지막 줄의 마지막 글자 뒤에 커서 표시 */}
-                    {isLastLine && charIndex === characters.length && (
+                    {line.isLastInDocument && charIndex === characters.length && (
                       <div ref={cursorRef} css={cursorStyle}></div>
                     )}
                   </div>
@@ -76,9 +104,9 @@ export function ReflectionTextArea() {
           })}
           
           {/* 빈 줄 추가 (최소 높이 확보) */}
-          {lines.length < 8 && Array.from({ length: 8 - lines.length }).map((_, idx) => (
+          {visualLines.length < 8 && Array.from({ length: 8 - visualLines.length }).map((_, idx) => (
             <div key={`empty-${idx}`} css={lineContainerStyle}>
-              {Array.from({ length: 20 }).map((_, charIdx) => (
+              {Array.from({ length: CHARS_PER_LINE }).map((_, charIdx) => (
                 <div key={charIdx} css={gridCellStyle}>
                   <span css={characterStyle}></span>
                 </div>

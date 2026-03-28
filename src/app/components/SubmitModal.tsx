@@ -21,6 +21,22 @@ export function SubmitModal({ isOpen, onClose }: SubmitModalProps) {
   const elapsedTime = useReflectionStore(state => state.getElapsedTime());
   const charCount = useReflectionStore(state => state.getCharacterCount());
   
+  // 텍스트를 그리드 형식으로 변환
+  const CHARS_PER_LINE = 20;
+  const paragraphs = text.split('\n');
+  const visualLines: string[] = [];
+  
+  paragraphs.forEach((paragraph, pIndex) => {
+    if (paragraph.length === 0) {
+      visualLines.push('');
+    } else {
+      for (let i = 0; i < paragraph.length; i += CHARS_PER_LINE) {
+        const chunk = paragraph.slice(i, i + CHARS_PER_LINE);
+        visualLines.push(chunk);
+      }
+    }
+  });
+  
   useEffect(() => {
     if (isOpen) {
       // 모달 열리고 1초 후 도장 애니메이션
@@ -104,8 +120,35 @@ export function SubmitModal({ isOpen, onClose }: SubmitModalProps) {
           </div>
           
           <div css={paperStyle}>
-            <div css={gridOverlayStyle} />
-            <div css={textContentStyle}>{text}</div>
+            <div css={gridContainerStyle}>
+              {/* 각 시각적 줄을 그리드로 렌더링 */}
+              {visualLines.map((line, lineIndex) => {
+                const characters = line.split('');
+                
+                return (
+                  <div key={lineIndex} css={lineContainerStyle}>
+                    {Array.from({ length: CHARS_PER_LINE }).map((_, charIndex) => (
+                      <div key={`${lineIndex}-${charIndex}`} css={gridCellStyle}>
+                        <span css={characterStyle}>
+                          {characters[charIndex] || ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+              
+              {/* 최소 8줄 확보 */}
+              {visualLines.length < 8 && Array.from({ length: 8 - visualLines.length }).map((_, idx) => (
+                <div key={`empty-${idx}`} css={lineContainerStyle}>
+                  {Array.from({ length: CHARS_PER_LINE }).map((_, charIdx) => (
+                    <div key={charIdx} css={gridCellStyle}>
+                      <span css={characterStyle}></span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
             
             {/* 도장 */}
             {showStamp && (
@@ -222,40 +265,40 @@ const paperStyle = css`
   margin-bottom: 32px;
 `;
 
-const gridOverlayStyle = css`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      var(--primary) 0px,
-      var(--primary) 1px,
-      transparent 1px,
-      transparent 32px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      var(--primary) 0px,
-      var(--primary) 1px,
-      transparent 1px,
-      transparent 32px
-    );
-  opacity: 0.12;
-`;
-
-const textContentStyle = css`
-  font-family: 'Noto Serif KR', serif;
-  font-size: 18px;
-  line-height: 32px;
-  color: var(--text);
-  white-space: pre-wrap;
-  word-break: break-word;
+const gridContainerStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
   position: relative;
   z-index: 1;
+`;
+
+const lineContainerStyle = css`
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 0;
+  width: 100%;
+`;
+
+const gridCellStyle = css`
+  aspect-ratio: 1;
+  border: 1px solid rgba(4, 100, 100, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: var(--surface);
+  min-width: 32px;
+  min-height: 32px;
+`;
+
+const characterStyle = css`
+  font-family: 'Noto Serif KR', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1;
 `;
 
 const stampAppear = keyframes`

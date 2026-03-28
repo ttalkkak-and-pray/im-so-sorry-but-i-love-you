@@ -93,6 +93,19 @@ export function InterrogationPage() {
       return;
     }
 
+    if (type === 'no') {
+      const newCount = noCount + 1;
+      setNoCount(newCount);
+      triggerShake(newCount);
+      
+      const effect = confessionData.meta.shakeEffects.levels.find(l => l.noCount === newCount);
+      if (effect && effect.triggerForcedCrime) return;
+
+      // Unconditionally go to next random for 'no' answers to allow reaching 10 questions
+      processNextRandom();
+      return;
+    }
+
     if (answerData.crime && answerData.type !== 'input' && answerData.type !== 'branch') {
       handleConfirmCrime(answerData.crime);
       return;
@@ -110,21 +123,6 @@ export function InterrogationPage() {
       setSubData(answerData);
       setStep('subQuestion');
       return;
-    }
-
-    if (type === 'no') {
-      const newCount = noCount + 1;
-      setNoCount(newCount);
-      triggerShake(newCount);
-      
-      // If triggerForcedCrime was called inside triggerShake, step would change to result
-      // But we need to ensure we don't proceed if forced
-      const effect = confessionData.meta.shakeEffects.levels.find(l => l.noCount === newCount);
-      if (effect && effect.triggerForcedCrime) return;
-
-      if (answerData.next === 'random') {
-        processNextRandom();
-      }
     }
   };
 
