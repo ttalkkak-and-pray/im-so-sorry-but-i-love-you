@@ -5,6 +5,7 @@ import { useReflectionStore } from '../store';
 
 export function ReflectionTextArea() {
   const text = useReflectionStore(state => state.text);
+  const nickname = useReflectionStore(state => state.nickname);
   const charCount = useReflectionStore(state => state.getCharacterCount());
   const cursorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -76,7 +77,7 @@ export function ReflectionTextArea() {
       <div css={headerStyle}>
         <h1 css={titleStyle}>반 성 문</h1>
         <div css={metaStyle}>
-          작성자: __________ | 날짜: {new Date().toLocaleDateString('ko-KR')}
+          작성자: {nickname || '__________'} | 날짜: {new Date().toLocaleDateString('ko-KR')}
         </div>
       </div>
       
