@@ -1,6 +1,8 @@
 # im-so-sorry-but-i-love-you (진정성 100% 반성문 봇)
 다 거짓말 🎶
 
+<img width=300 src="https://velog.velcdn.com/images/d159123/post/89f30216-fb6f-4105-b6e4-70588590a1a4/image.png"></img>
+
 ## 🔨 프로젝트 개요
 **"당신은 이미 유죄입니다."**
 어떤 대답을 해도 최종적으로 죄목이 확정되고 강제로 반성문을 쓰게 되는 만우절 인터랙티브 웹 애플리케이션입니다.
