@@ -2,6 +2,7 @@
 다 거짓말 🎶
 
 <img width=300 src="https://velog.velcdn.com/images/d159123/post/89f30216-fb6f-4105-b6e4-70588590a1a4/image.png"></img>
+> 🎤 [발표 자료 보러가기](https://claude.ai/public/artifacts/5f4d40b0-96d1-4063-b32b-9ad19e6dd8b6)
 
 ## 🔨 프로젝트 개요
 **"당신은 이미 유죄입니다."**
